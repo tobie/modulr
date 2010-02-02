@@ -1,8 +1,8 @@
 module Modulr
   LIB_DIR = File.dirname(__FILE__)
-  VENDOR_DIR = File.join(LIB_DIR, '..', 'vendor', 'rkelly', 'lib')
+  PARSER_DIR = File.join(LIB_DIR, '..', 'vendor', 'rkelly', 'lib')
   $:.unshift(LIB_DIR)
-  $:.unshift(VENDOR_DIR)
+  $:.unshift(PARSER_DIR)
   
   require 'modulr/js_module'
   require 'modulr/collector'

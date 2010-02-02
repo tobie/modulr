@@ -2,7 +2,7 @@ var modulr = (function() {
   var _modules = {},
       _aliases = {},
       _cache = {},
-      PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.  
+      PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
   
   function log(str) {
     if (console && console.log) { console.log(str); }
