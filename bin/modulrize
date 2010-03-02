@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../lib/modulr'
+
+usage = "Usage: modulrize input_file output_file"
+
+if ARGV.size != 2
+  puts usage
+  exit 1
+elsif ARGV.any? { |option| %w(--help -h).include?(option) }
+  puts usage
+else
+  Modulr.ize(:input => ARGV[0], :output => ARGV[1])
+end
