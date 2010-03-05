@@ -63,7 +63,7 @@ module Modulr
       end
   end
   
-  class ModuleIdentifierError < StandardError
+  class ModuleIdentifierError < ModulrError
     attr_reader :js_module
     def initialize(js_module)
       @js_module = js_module
@@ -71,7 +71,7 @@ module Modulr
     end
   end
 
-  class LoadModuleError < StandardError
+  class LoadModuleError < ModulrError
     attr_reader :js_module
     def initialize(js_module)
       @js_module = js_module
