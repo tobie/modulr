@@ -1,13 +1,15 @@
 module Modulr
   class JSModule
-    def self.from_expression(exp, file)
+    def self.from_expression(exp, root, file)
       str = exp.arguments.first.value.first
-      new(str.value[1...-1], file, str.line.to_i)
+      new(str.value[1...-1], root, file, str.line.to_i)
     end
 
-    attr_reader :identifier, :terms, :file, :line
-    def initialize(identifier, file, line)
+    attr_reader :identifier, :root, :terms, :file, :line
+    
+    def initialize(identifier, root, file, line)
       @identifier = identifier
+      @root = root
       @file = file
       @line = line
       @terms = identifier.split('/').reject { |term| term == '' }
@@ -31,13 +33,7 @@ module Modulr
     end
 
     def path
-      if @path
-        @path
-      else
-        Dir.chdir(File.dirname(file)) do
-          @path = File.expand_path(File.join(*terms)) << '.js'
-        end
-      end
+      @path ||= File.expand_path(partial_path, directory) + '.js'
     end
     
     def src
@@ -52,6 +48,19 @@ module Modulr
     def to_js(buffer = '')
       buffer << "modulr.cache('#{identifier}', function(require, exports) {\n#{src}\n  return exports;\n});\n"
     end
+    
+    protected
+      def partial_path
+        File.join(*terms)
+      end
+      
+      def directory
+        if relative?
+          File.dirname(file)
+        else
+          root
+        end
+      end
   end
   
   class ModuleIdentifierError < StandardError

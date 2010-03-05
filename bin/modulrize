@@ -1,13 +1,39 @@
 #!/usr/bin/env ruby
 require File.dirname(__FILE__) + '/../lib/modulr'
+require 'optparse'
 
-usage = "Usage: modulrize input_file output_file"
+options = {
+  :output => STDOUT
+}
 
-if ARGV.size != 2
-  puts usage
-  exit 1
-elsif ARGV.any? { |option| %w(--help -h).include?(option) }
-  puts usage
-else
-  Modulr.ize(:input => ARGV[0], :output => ARGV[1])
+opts = OptionParser.new do |opts|
+  opts.banner = 'Usage: modulrize [options] FILE'
+  
+  opts.on('-o', '--output=FILE', 'Write the output to FILE. Defaults to stdout') do |output|
+    options[:output] = File.open(output, 'w')
+  end
+  
+  opts.on('-r', '--root=DIR', 'Set DIR as root directory. Defaults to the directory containing FILE') do |root|
+    options[:root] = root
+  end
+  
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
+end
+
+opts.parse!
+
+output = options.delete(:output)
+
+begin
+  if ARGV.size != 1
+    puts opts
+    exit 1
+  end
+  result = Modulr.ize(ARGV.first, options)
+  output.print(result)
+ensure
+  output.close
 end

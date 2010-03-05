@@ -4,7 +4,9 @@ require 'lib/modulr'
 
 desc "Concatenate example file"
 task :build_example do
-  Modulr.ize(:input => 'example/program.js', :output => 'output/example.js')
+  File.open(File.join('output', 'example.js'), 'w') do |f|
+    f << Modulr.ize(File.join('example', 'program.js'))
+  end
 end
 
 begin

@@ -9,9 +9,9 @@ module Modulr
   
   PATH_TO_MODULR_JS = File.join(LIB_DIR, '..', 'assets', 'modulr.js')
   
-  def self.ize(options)
-    collector = Collector.new
-    collector.parse_file(options[:input])
-    File.open(options[:output], 'w+') { |f| collector.to_js(f) }
+  def self.ize(input_filename, options = {})
+    collector = Collector.new(options[:root])
+    collector.parse_file(input_filename)
+    collector.to_js
   end
 end
