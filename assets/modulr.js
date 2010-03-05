@@ -1,11 +1,11 @@
-var modulr = (function() {
+var modulr = (function(global) {
   var _modules = {},
       _aliases = {},
       _cache = {},
       PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
   
   function log(str) {
-    if (console && console.log) { console.log(str); }
+    if (global.console && console.log) { console.log(str); }
   }
   
   function require(identifier) {
@@ -46,4 +46,4 @@ var modulr = (function() {
     cache: cache,
     alias: alias
   };
-})();
+})(this);
