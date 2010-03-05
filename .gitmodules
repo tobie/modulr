@@ -1,0 +1,3 @@
+[submodule "vendor/commonjs"]
+	path = vendor/commonjs
+	url = git://github.com/commonjs/commonjs.git
