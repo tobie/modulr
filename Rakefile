@@ -33,6 +33,8 @@ task :spec do
     ensure
       FileUtils.rm(output)
       FileUtils.rm(system)
+      puts
+      puts
     end
   end
 end
