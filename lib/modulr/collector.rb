@@ -2,7 +2,7 @@ require 'rkelly'
 
 module Modulr
   class Collector
-    attr_reader :modules, :aliases
+    attr_reader :modules, :aliases, :main
     
     def initialize(root = nil)
       @root = root
@@ -13,6 +13,8 @@ module Modulr
     def parse_file(path)
       @src = File.read(path)
       @root ||= File.dirname(path)
+      @main = JSModule.new(File.basename(path, '.js'), @root, path)
+      modules[main.path] = main
       find_dependencies(@src, path)
     end
     
@@ -56,12 +58,11 @@ module Modulr
     
     def to_js(buffer = '')
       buffer << File.read(PATH_TO_MODULR_JS);
-      buffer << "\nvar require = modulr.require;\n" if parser.parse(@src).any?(&method(:is_a_require_expression?))
       modules.each { |id, js_module| js_module.to_js(buffer) }
       aliases.each do |id, alias_id|
         buffer << "modulr.alias('#{id}', '#{modules[alias_id].identifier}');\n"
       end
-      buffer << @src
+      buffer << "\nmodulr.require('#{main.identifier}');\n"
     end
   end
 end

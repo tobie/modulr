@@ -7,7 +7,7 @@ module Modulr
 
     attr_reader :identifier, :root, :terms, :file, :line
     
-    def initialize(identifier, root, file, line)
+    def initialize(identifier, root, file=nil, line=nil)
       @identifier = identifier
       @root = root
       @file = file
