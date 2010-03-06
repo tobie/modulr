@@ -1,7 +1,7 @@
 var modulr = (function(global) {
   var _modules = {},
       _aliases = {},
-      _cache = {},
+      _exports = {},
       _emptyExports = {},
       PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
   
@@ -10,7 +10,7 @@ var modulr = (function(global) {
   }
   
   function require(identifier) {
-    var m, key = PREFIX + identifier;
+    var moduleFunction, key = PREFIX + identifier;
     log('Required module "' + identifier + '".');
     
     if (_aliases[key]) {
@@ -22,14 +22,16 @@ var modulr = (function(global) {
       return _emptyExports[key];
     }
     
-    if (!_cache[key]) {
-      m = _modules[key];
-      if (!m) { throw 'Can\'t find module "' + identifier + '".'; }
+    if (!_exports[key]) {
+      moduleFunction = _modules[key];
+      if (!moduleFunction) {
+        throw 'Can\'t find module "' + identifier + '".';
+      }
       _emptyExports[key] = {};
-      _cache[key] = m(require, _emptyExports[key]);
+      _exports[key] = moduleFunction(require, _emptyExports[key]);
       delete _emptyExports[key];
     }
-    return _cache[key];
+    return _exports[key];
   }
   
   function cache(identifier, fn) {
