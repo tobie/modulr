@@ -14,7 +14,7 @@ var modulr = (function(global) {
     
     if (_aliases[key]) {
       key = _aliases[key];
-      log('Found module "' + identifier + '" as alias of module "' + key.replace('__module__', '') + '".');
+      log('Found module "' + identifier + '" as alias of module "' + key.replace(PREFIX, '') + '".');
     }
     
     if (!_cache[key]) { 
