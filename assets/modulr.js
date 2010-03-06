@@ -31,7 +31,7 @@ var modulr = (function(global) {
     log('Cached module "' + identifier + '".');
     
     if (_modules[key]) {
-      throw 'Can\'t ovewrite module "' + identifier + '".';
+      throw 'Can\'t overwrite module "' + identifier + '".';
     }
     _modules[key] = fn;
   }
