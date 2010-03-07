@@ -14,7 +14,7 @@ module Modulr
       @src = File.read(path)
       @root ||= File.dirname(path)
       @main = JSModule.new(File.basename(path, '.js'), @root, path)
-      modules[main.path] = main
+      modules[main.id] = main
       find_dependencies(@src, path)
     end
     
@@ -30,12 +30,12 @@ module Modulr
       parse(src).each do |exp|
         if is_a_require_expression?(exp) || is_a_modulr_require_expression?(exp)
           js_module = JSModule.from_expression(exp, @root, path)
-          if cached_module = modules[js_module.path]
+          if cached_module = modules[js_module.id]
             if cached_module.identifier != js_module.identifier
-              aliases[js_module.identifier] = js_module.path
+              aliases[js_module.identifier] = js_module.id
             end
           else
-            modules[js_module.path] = js_module
+            modules[js_module.id] = js_module
             find_dependencies(js_module.src, js_module.path)
           end
         end
@@ -59,8 +59,8 @@ module Modulr
     def to_js(buffer = '')
       buffer << File.read(PATH_TO_MODULR_JS);
       modules.each { |id, js_module| js_module.to_js(buffer) }
-      aliases.each do |id, alias_id|
-        buffer << "modulr.alias('#{id}', '#{modules[alias_id].identifier}');\n"
+      aliases.each do |identifier, id|
+        buffer << "modulr.alias('#{identifier}', '#{id}');\n"
       end
       buffer << "\nmodulr.require('#{main.identifier}');\n"
     end

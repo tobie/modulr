@@ -1,6 +1,6 @@
 var modulr = (function(global) {
   var _modules = {},
-      _aliases = {},
+      _references = {},
       _exports = {},
       PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
   
@@ -9,38 +9,37 @@ var modulr = (function(global) {
   }
   
   function require(identifier) {
-    var moduleFunction, key = PREFIX + identifier;
+    var id = _references[PREFIX + identifier], fn;
+    
     log('Required module "' + identifier + '".');
     
-    if (_aliases[key]) {
-      key = _aliases[key];
-      log('Found module "' + identifier + '" as alias of module "' + key.replace(PREFIX, '') + '".');
-    }
-    
-    if (!_exports[key]) {
-      moduleFunction = _modules[key];
-      if (!moduleFunction) {
+    if (!_exports[id]) {
+      fn = _modules[id];
+      
+      if (!fn) {
         throw 'Can\'t find module "' + identifier + '".';
       }
-      _exports[key] = {};
-      moduleFunction(require, _exports[key]);
+      
+      _exports[id] = {};
+      fn(require, _exports[id]);
     }
-    return _exports[key];
+    return _exports[id];
   }
   
-  function cache(identifier, fn) {
-    var key = PREFIX + identifier;
+  function cache(identifier, id, fn) {
     log('Cached module "' + identifier + '".');
+    id = PREFIX + id;
     
-    if (_modules[key]) {
+    if (_modules[id]) {
       throw 'Can\'t overwrite module "' + identifier + '".';
     }
-    _modules[key] = fn;
+    _modules[id] = fn;
+    _references[PREFIX + identifier] = id;
   }
   
-  function alias(alias, identifier) {
-    log('Linked "' + alias + '" to module "' + identifier + '".');
-    _aliases[PREFIX + alias] = PREFIX + identifier;
+  function alias(identifier, id) {
+    log('Linked "' + identifier + '" to module "' + id + '".');
+    _references[PREFIX + identifier] = PREFIX + id;
   }
   
   return {

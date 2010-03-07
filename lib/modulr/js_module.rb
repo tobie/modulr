@@ -23,6 +23,12 @@ module Modulr
     def identifier_valid?
       @valid ||= terms.all? { |t| t =~ /^([a-zA-Z]+|\.\.?)$/ }
     end
+    
+    def id
+      return @id if @id
+      @id = File.expand_path(partial_path, directory)
+      @id.sub!("#{File.expand_path(root)}/", '')
+    end
 
     def relative?
       @relative ||= terms.first =~ /^\.\.?$/
