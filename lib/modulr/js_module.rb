@@ -52,8 +52,8 @@ module Modulr
     end
     
     def to_js(buffer = '')
-      buffer << "modulr.cache('#{identifier}', '#{id}', "
-      buffer << "function(require, exports, module) {\n#{src}\n});\n"
+      fn = "function(require, exports, module) {\n#{src}\n}"
+      buffer << "modulr.cache('#{identifier}', '#{id}', #{fn});"
     end
     
     protected
