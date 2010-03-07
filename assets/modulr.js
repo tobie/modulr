@@ -23,6 +23,7 @@ var modulr = (function(global) {
       
       _exports[id] = {};
       _moduleObjects[id] = { id: id.replace(PREFIX, '') };
+      if (!require.main) { require.main = _moduleObjects[id]; }
       fn(require, _exports[id], _moduleObjects[id]);
     }
     return _exports[id];
