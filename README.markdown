@@ -21,11 +21,11 @@ Usage
 `modulr` accepts a singular file as input (the _program_) on which is does static
 analysis to recursively resolve its dependencies.
 
-The program, its dependencies and a small, namespaced JavaScript library are concatenated into a single `js` file which
+The program, its dependencies and a small, namespaced JavaScript library are concatenated into a single `js` file. This
 [improves load times by minimizing HTTP requests](http://developer.yahoo.com/performance/rules.html#num_http).
 
-The bundled JavaScript library provides the necessary `require` function and
-the `exports` and `module` free variables.
+The bundled JavaScript library provides each module with the necessary `require`
+function and `exports` and `module` free variables.
 
 `modulr` is available as a Ruby program or as a command-line utility (`modulrize`).
 
