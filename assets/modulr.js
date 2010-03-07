@@ -10,23 +10,23 @@ var modulr = (function(global) {
   }
   
   function require(identifier) {
-    var id = _references[PREFIX + identifier], fn;
+    var fn, modObj,
+        id = _references[PREFIX + identifier],
+        expts = _exports[id];
     
     log('Required module "' + identifier + '".');
     
-    if (!_exports[id]) {
+    if (!expts) {
+      _exports[id] = expts = {};
+      _moduleObjects[id] = modObj = { id: id.replace(PREFIX, '') };
+      
+      if (!require.main) { require.main = modObj; }
+      
       fn = _modules[id];
-      
-      if (!fn) {
-        throw 'Can\'t find module "' + identifier + '".';
-      }
-      
-      _exports[id] = {};
-      _moduleObjects[id] = { id: id.replace(PREFIX, '') };
-      if (!require.main) { require.main = _moduleObjects[id]; }
-      fn(require, _exports[id], _moduleObjects[id]);
+      if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
+      fn(require, expts, modObj);
     }
-    return _exports[id];
+    return expts;
   }
   
   function cache(identifier, id, fn) {
