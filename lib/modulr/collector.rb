@@ -28,7 +28,7 @@ module Modulr
     
     def find_dependencies(src, path)
       parse(src).each do |exp|
-        if is_a_require_expression?(exp) || is_a_modulr_require_expression?(exp)
+        if is_a_require_expression?(exp)
           js_module = JSModule.from_expression(exp, @root, path)
           if cached_module = modules[js_module.id]
             if cached_module.identifier != js_module.identifier
@@ -46,14 +46,6 @@ module Modulr
       node.is_a?(RKelly::Nodes::FunctionCallNode) &&
       node.value.is_a?(RKelly::Nodes::ResolveNode) &&
       node.value.value == 'require'
-    end
-
-    def is_a_modulr_require_expression?(node)
-      node.is_a?(RKelly::Nodes::FunctionCallNode) &&
-      node.value.is_a?(RKelly::Nodes::DotAccessorNode) &&
-      node.value.accessor == 'require' &&
-      node.value.value.is_a?(RKelly::Nodes::ResolveNode) &&
-      node.value.value.value == 'modulr'
     end
     
     def to_js(buffer = '')
