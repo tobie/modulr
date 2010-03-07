@@ -2,7 +2,6 @@ var modulr = (function(global) {
   var _modules = {},
       _aliases = {},
       _exports = {},
-      _emptyExports = {},
       PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
   
   function log(str) {
@@ -18,18 +17,13 @@ var modulr = (function(global) {
       log('Found module "' + identifier + '" as alias of module "' + key.replace(PREFIX, '') + '".');
     }
     
-    if (_emptyExports[key]) { // cyclic reference
-      return _emptyExports[key];
-    }
-    
     if (!_exports[key]) {
       moduleFunction = _modules[key];
       if (!moduleFunction) {
         throw 'Can\'t find module "' + identifier + '".';
       }
-      _emptyExports[key] = {};
-      _exports[key] = moduleFunction(require, _emptyExports[key]);
-      delete _emptyExports[key];
+      _exports[key] = {};
+      moduleFunction(require, _exports[key]);
     }
     return _exports[key];
   }
