@@ -1,5 +1,6 @@
 var modulr = (function(global) {
   var _modules = {},
+      _moduleObjects = {},
       _references = {},
       _exports = {},
       PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
@@ -21,7 +22,8 @@ var modulr = (function(global) {
       }
       
       _exports[id] = {};
-      fn(require, _exports[id]);
+      _moduleObjects[id] = { id: id.replace(PREFIX, '') };
+      fn(require, _exports[id], _moduleObjects[id]);
     }
     return _exports[id];
   }
