@@ -27,7 +27,15 @@ The program, its dependencies and a small, namespaced JavaScript library are con
 The bundled JavaScript library provides each module with the necessary `require`
 function and `exports` and `module` free variables.
 
-`modulr` is available as a Ruby program or as a command-line utility (`modulrize`).
+`modulr` is available as a Ruby library or as a command-line utility (`modulrize`).
+
+To process a JavaScript source file, just run:
+
+    $ modulrize filename.js > output.js
+
+For a comprehensive list of options:
+
+    $ modulrize --help"
 
 Specs
 -----
