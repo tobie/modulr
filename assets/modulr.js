@@ -1,3 +1,8 @@
+// modulr (c) 2010 codespeaks sàrl
+// Freely distributable under the terms of the MIT license.
+// For details, see:
+//   http://github.com/codespeaks/modulr/blob/master/LICENSE
+
 var modulr = (function(global) {
   var _modules = {},
       _moduleObjects = {},
