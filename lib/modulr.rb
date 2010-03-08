@@ -9,6 +9,7 @@ module Modulr
   
   require 'modulr/js_module'
   require 'modulr/collector'
+  require 'modulr/version'
   
   PATH_TO_MODULR_JS = File.join(LIB_DIR, '..', 'assets', 'modulr.js')
   
