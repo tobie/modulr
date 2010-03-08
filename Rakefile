@@ -47,7 +47,7 @@ begin
     gemspec.author = "Tobie Langel"
     gemspec.email = "tobie.langel@gmail.com"
     gemspec.homepage = "http://github.com/tobie/modulr"
-    gemspec.files = FileList["Rakefile", "VERSION", "{lib,bin,assets,vendor,example}/**/*"]
+    gemspec.files = FileList["Rakefile", "README.markdown", "LICENSE", "VERSION", "{lib,bin,assets,example}/**/*", "vendor/rkelly/**/*"]
     gemspec.executable = "modulrize"
   end
 rescue LoadError
