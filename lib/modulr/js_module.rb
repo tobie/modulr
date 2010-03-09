@@ -79,11 +79,7 @@ module Modulr
       end
       
       def directory
-        if relative?
-          File.dirname(file)
-        else
-          root
-        end
+        relative? ? File.dirname(file) : root
       end
   end
   
