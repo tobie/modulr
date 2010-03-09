@@ -1,10 +1,16 @@
 module Modulr
   class JSModule
-    def self.from_expression(exp, root, file)
-      str = exp.arguments.first.value.first
-      new(str.value[1...-1], root, file, str.line.to_i)
+    def self.parser
+      @dependency_finder ||= Parser.new
     end
-
+    
+    def self.find_dependencies(js_module)
+      expressions = parser.get_require_expressions(js_module.src)
+      expressions.map do |exp|
+        new(exp[:identifier], js_module.root, js_module.path, exp[:line])
+      end
+    end
+    
     attr_reader :identifier, :root, :terms, :file, :line
     
     def initialize(identifier, root, file=nil, line=nil)
@@ -26,8 +32,12 @@ module Modulr
     
     def id
       return @id if @id
-      @id = File.expand_path(partial_path, directory)
-      @id.sub!("#{File.expand_path(root)}/", '')
+      if top_level?
+        @id = identifier
+      else
+        @id = File.expand_path(partial_path, directory)
+        @id.sub!("#{File.expand_path(root)}/", '')
+      end
     end
 
     def relative?
@@ -51,9 +61,16 @@ module Modulr
       end
     end
     
+    def dependencies
+      @dependencies ||= self.class.find_dependencies(self)
+    end
+
     def to_js(buffer = '')
+      if relative?
+        buffer << "\nmodulr.alias('#{identifier}', '#{id}');"
+      end
       fn = "function(require, exports, module) {\n#{src}\n}"
-      buffer << "modulr.cache('#{identifier}', '#{id}', #{fn});"
+      buffer << "\nmodulr.cache('#{id}', #{fn});\n"
     end
     
     protected

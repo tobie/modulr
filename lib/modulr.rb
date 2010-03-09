@@ -8,6 +8,7 @@ module Modulr
   end
   
   require 'modulr/js_module'
+  require 'modulr/parser'
   require 'modulr/collector'
   require 'modulr/version'
   

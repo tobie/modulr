@@ -16,7 +16,8 @@ var modulr = (function(global) {
   
   function require(identifier) {
     var fn, modObj,
-        id = _references[PREFIX + identifier],
+        key = PREFIX + identifier,
+        id = _references[key] || key,
         expts = _exports[id];
     
     log('Required module "' + identifier + '".');
@@ -34,15 +35,14 @@ var modulr = (function(global) {
     return expts;
   }
   
-  function cache(identifier, id, fn) {
-    log('Cached module "' + identifier + '".');
-    id = PREFIX + id;
+  function cache(id, fn) {
+    var key = PREFIX + id;
     
-    if (_modules[id]) {
-      throw 'Can\'t overwrite module "' + identifier + '".';
+    log('Cached module "' + id + '".');
+    if (_modules[key]) {
+      throw 'Can\'t overwrite module "' + id + '".';
     }
-    _modules[id] = fn;
-    _references[PREFIX + identifier] = id;
+    _modules[key] = fn;
   }
   
   function alias(identifier, id) {
