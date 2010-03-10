@@ -1,5 +1,17 @@
 module Modulr
   class JSModule
+    include Comparable
+    
+    JS_ESCAPE_MAP = {
+      '\\'    => '\\\\',
+      '</'    => '<\/',
+      "\r\n"  => '\n',
+      "\n"    => '\n',
+      "\r"    => '\n',
+      '"'     => '\\"',
+      "'"     => "\\'"
+    }
+    
     def self.parser
       @dependency_finder ||= Parser.new
     end
@@ -20,6 +32,10 @@ module Modulr
       @line = line
       @terms = identifier.split('/').reject { |term| term == '' }
       raise ModuleIdentifierError.new(self) unless identifier_valid?
+    end
+    
+    def <=> (other_module)
+      id <=> other_module.id
     end
 
     def inspect
@@ -61,16 +77,25 @@ module Modulr
       end
     end
     
+    def escaped_src
+      @escaped_src ||= src.gsub(/(\\|<\/|\r\n|[\n\r"'])/) {
+        JS_ESCAPE_MAP[$1]
+      }
+    end
+    
     def dependencies
       @dependencies ||= self.class.find_dependencies(self)
     end
 
     def to_js(buffer = '')
-      if relative?
-        buffer << "\nmodulr.alias('#{identifier}', '#{id}');"
-      end
+      call_alias_js_function(buffer)
       fn = "function(require, exports, module) {\n#{src}\n}"
       buffer << "\nmodulr.cache('#{id}', #{fn});\n"
+    end
+    
+    def to_js_string(buffer = '')
+      call_alias_js_function(buffer)
+      buffer << "\nmodulr.cache('#{id}', '#{escaped_src}');\n"
     end
     
     protected
@@ -80,6 +105,12 @@ module Modulr
       
       def directory
         relative? ? File.dirname(file) : root
+      end
+      
+      def call_alias_js_function(buffer)
+        if relative?
+          buffer << "\nmodulr.alias('#{identifier}', '#{id}');"
+        end
       end
   end
   

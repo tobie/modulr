@@ -7,17 +7,24 @@ options = {
 }
 
 opts = OptionParser.new do |opts|
-  opts.banner = 'Usage: modulrize [options] FILE'
+  opts.banner = 'Usage: modulrize program.js [options] > output.js'
   
-  opts.on('-o', '--output=FILE', 'Write the output to FILE. Defaults to stdout') do |output|
+  opts.on('-o', '--output=FILE', 'Write the output to FILE. Defaults to stdout.') do |output|
     options[:output] = File.open(output, 'w')
   end
   
-  opts.on('-r', '--root=DIR', 'Set DIR as root directory. Defaults to the directory containing FILE') do |root|
+  opts.on('-r', '--root=DIR', 'Set DIR as root directory. Defaults to the directory containing FILE.') do |root|
     options[:root] = root
   end
   
-  opts.on_tail('-h', '--help', 'Show this message') do
+  opts.on('--lazy-eval [MODULES]', Array,
+    'Enable lazy evaluation of all JS modules or of those specified by MODULES.',
+    'MODULES accepts a comma-separated list of identifiers.') do |modules|
+    modules = true unless modules
+    options[:lazy_eval] = modules
+  end
+  
+  opts.on_tail('-h', '--help', 'Show this message.') do
     puts opts
     exit
   end
