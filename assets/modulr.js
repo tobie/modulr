@@ -31,7 +31,7 @@ var modulr = (function(global) {
       fn = _modules[id];
       if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
       if (typeof fn === 'string') {
-        fn = eval('function(require, exports, module) {' + fn + '}');
+        fn = new Function('require', 'exports', 'module', fn);
       }
       fn(require, expts, modObj);
     }
