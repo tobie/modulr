@@ -5,21 +5,8 @@ Description
 -----------
 
 `modulr` is a [CommonJS module implementation](http://commonjs.org/specs/modules/1.0.html)
-in Ruby for client-side JavaScript.
-
-* [Github repository](http://github.com/codespeaks/modulr)
-* [Specification](http://wiki.commonjs.org/wiki/Modules/1.0)
-
-Install
--------
-
-    $ [sudo] gem install modulr
-
-Usage
------
-
-`modulr` accepts a singular file as input (the _program_) on which is does static
-analysis to recursively resolve its dependencies.
+in Ruby for client-side JavaScript. It accepts a singular file as input (the _program_) on
+which is does static analysis to recursively resolve its dependencies.
 
 The program, its dependencies and a small, namespaced JavaScript library are
 concatenated into a single `js` file. This improves load times by
@@ -31,6 +18,17 @@ evaluated only when required.
 
 The bundled JavaScript library provides each module with the necessary `require`
 function and `exports` and `module` free variables.
+
+* [Github repository](http://github.com/codespeaks/modulr)
+* [Specification](http://wiki.commonjs.org/wiki/Modules/1.0)
+
+Install
+-------
+
+    $ [sudo] gem install modulr
+
+Usage
+-----
 
 `modulr` is available as a Ruby library or as a command-line utility (`modulrize`).
 
