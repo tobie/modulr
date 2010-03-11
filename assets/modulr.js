@@ -7,8 +7,8 @@ var modulr = (function(global) {
   var _modules = {},
       _moduleObjects = {},
       _exports = {},
-      oldDir = '',
-      currentDir = '',
+      _oldDir = '',
+      _currentDir = '',
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
       RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
   
@@ -18,7 +18,7 @@ var modulr = (function(global) {
   
   function require(identifier) {
     var fn, modObj,
-        id = expandIdentifier(identifier),
+        id = resolveIdentifier(identifier),
         key = PREFIX + id,
         expts = _exports[key];
     
@@ -31,8 +31,8 @@ var modulr = (function(global) {
       if (!require.main) { require.main = modObj; }
       
       fn = _modules[key];
-      oldDir = currentDir;
-      currentDir = id.slice(0, id.lastIndexOf('/'));
+      _oldDir = _currentDir;
+      _currentDir = id.slice(0, id.lastIndexOf('/'));
       
       try {
         if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
@@ -40,23 +40,28 @@ var modulr = (function(global) {
           fn = new Function('require', 'exports', 'module', fn);
         }
         fn(require, expts, modObj);
-      } catch(e) { // IE doesn't support `finally` without `catch`.
+        _currentDir = _oldDir;
+      } catch(e) {
+        _currentDir = _oldDir;
+        // We'd use a finally statement here if it wasn't for IE.
         throw e;
-      } finally {
-        currentDir = oldDir;
       }
     }
     return expts;
   }
   
-  function expandIdentifier(identifier) {
+  function resolveIdentifier(identifier) {
+    var parts, part, path;
+    
     if (!RELATIVE_IDENTIFIER_PATTERN.test(identifier)) {
       return identifier;
     }
-    var parts = (currentDir + '/' + identifier).split('/'),
-        path = [];
-    for (var i = 0; i < parts.length; i++) {
-      switch (parts[i]) {
+    
+    parts = (_currentDir + '/' + identifier).split('/');
+    path = [];
+    for (var i = 0, length = parts.length; i < length; i++) {
+      part = parts[i];
+      switch (part) {
         case '':
         case '.':
           continue;
@@ -64,7 +69,7 @@ var modulr = (function(global) {
           path.pop();
           break;
         default:
-          path.push(parts[i]);
+          path.push(part);
       }
     }
     return path.join('/');
