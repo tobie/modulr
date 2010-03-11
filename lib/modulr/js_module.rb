@@ -88,13 +88,11 @@ module Modulr
     end
 
     def to_js(buffer = '')
-      call_alias_js_function(buffer)
       fn = "function(require, exports, module) {\n#{src}\n}"
       buffer << "\nmodulr.cache('#{id}', #{fn});\n"
     end
     
     def to_js_string(buffer = '')
-      call_alias_js_function(buffer)
       buffer << "\nmodulr.cache('#{id}', '#{escaped_src}');\n"
     end
     
@@ -105,12 +103,6 @@ module Modulr
       
       def directory
         relative? ? File.dirname(file) : root
-      end
-      
-      def call_alias_js_function(buffer)
-        if relative?
-          buffer << "\nmodulr.alias('#{identifier}', '#{id}');"
-        end
       end
   end
   

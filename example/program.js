@@ -6,4 +6,5 @@ inspect(require('inspect') === require('inspect'));
 var foo = require('foo/foo');
 inspect(foo.relative);
 inspect(foo.relative === foo.relative2);
+inspect(foo.relative === foo.relative3);
 inspect(foo.toplevel === require('math').add);

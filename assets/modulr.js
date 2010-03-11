@@ -6,9 +6,11 @@
 var modulr = (function(global) {
   var _modules = {},
       _moduleObjects = {},
-      _references = {},
       _exports = {},
-      PREFIX = '__module__'; // Prefix identifiers to avoid issues in IE.
+      oldDir = '',
+      currentDir = '',
+      PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
+      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
   
   function log(str) {
     if (global.console && console.log) { console.log(str); }
@@ -16,26 +18,56 @@ var modulr = (function(global) {
   
   function require(identifier) {
     var fn, modObj,
-        key = PREFIX + identifier,
-        id = _references[key] || key,
-        expts = _exports[id];
+        id = expandIdentifier(identifier),
+        key = PREFIX + id,
+        expts = _exports[key];
     
     log('Required module "' + identifier + '".');
     
     if (!expts) {
-      _exports[id] = expts = {};
-      _moduleObjects[id] = modObj = { id: id.replace(PREFIX, '') };
+      _exports[key] = expts = {};
+      _moduleObjects[key] = modObj = { id: id };
       
       if (!require.main) { require.main = modObj; }
       
-      fn = _modules[id];
-      if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
-      if (typeof fn === 'string') {
-        fn = new Function('require', 'exports', 'module', fn);
+      fn = _modules[key];
+      oldDir = currentDir;
+      currentDir = id.slice(0, id.lastIndexOf('/'));
+      
+      try {
+        if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
+        if (typeof fn === 'string') {
+          fn = new Function('require', 'exports', 'module', fn);
+        }
+        fn(require, expts, modObj);
+      } catch(e) { // IE doesn't support `finally` without `catch`.
+        throw e;
+      } finally {
+        currentDir = oldDir;
       }
-      fn(require, expts, modObj);
     }
     return expts;
+  }
+  
+  function expandIdentifier(identifier) {
+    if (!RELATIVE_IDENTIFIER_PATTERN.test(identifier)) {
+      return identifier;
+    }
+    var parts = (currentDir + '/' + identifier).split('/'),
+        path = [];
+    for (var i = 0; i < parts.length; i++) {
+      switch (parts[i]) {
+        case '':
+        case '.':
+          continue;
+        case '..':
+          path.pop();
+          break;
+        default:
+          path.push(parts[i]);
+      }
+    }
+    return path.join('/');
   }
   
   function cache(id, fn) {
@@ -48,14 +80,8 @@ var modulr = (function(global) {
     _modules[key] = fn;
   }
   
-  function alias(identifier, id) {
-    log('Linked "' + identifier + '" to module "' + id + '".');
-    _references[PREFIX + identifier] = PREFIX + id;
-  }
-  
   return {
     require: require,
-    cache: cache,
-    alias: alias
+    cache: cache
   };
 })(this);
