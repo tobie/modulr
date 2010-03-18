@@ -46,7 +46,7 @@ begin
     gemspec.summary = "A CommonJS module implementation in Ruby for client-side JavaScript"
     gemspec.author = "Tobie Langel"
     gemspec.email = "tobie.langel@gmail.com"
-    gemspec.homepage = "http://github.com/tobie/modulr"
+    gemspec.homepage = "http://github.com/codespeaks/modulr"
     gemspec.files = FileList["Rakefile", "README.markdown", "LICENSE", "VERSION", "{lib,bin,assets,example}/**/*", "vendor/rkelly/**/*"]
     gemspec.executable = "modulrize"
   end
