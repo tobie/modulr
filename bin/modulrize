@@ -9,6 +9,9 @@ options = {
 opts = OptionParser.new do |opts|
   opts.banner = 'Usage: modulrize program.js [options] > output.js'
   
+  opts.separator ''
+  opts.separator 'Options:'
+  
   opts.on('-o', '--output=FILE', 'Write the output to FILE. Defaults to stdout.') do |output|
     options[:output] = File.open(output, 'w')
   end
@@ -24,10 +27,39 @@ opts = OptionParser.new do |opts|
     options[:lazy_eval] = modules
   end
   
-  opts.on_tail('-h', '--help', 'Show this message.') do
+  opts.on('--minify', 'Minify output using YUI Compressor.') do |minify|
+    options[:minify] = minify
+  end
+  
+  opts.on('-h', '--help', 'Show this message.') do
     puts opts
     exit
   end
+  
+  opts.separator ''
+  opts.separator 'Minification options (these are forwarded to YUI Compressor without the "minify-" prefix):'
+  
+  {
+    'line-break COLUMN'     => 'Insert a line break after the specified column number.',
+    'verbose'               => 'Display informational messages and warnings.',
+    'nomunge'               => 'Minify only, do not obfuscate.',
+    'preserve-semi'         => 'Preserve all semicolons.',
+    'disable-optimizations' => 'Disable all micro optimizations.'
+  }.each do |option, message|
+    prefixed_option = option.sub(/\A(\[no-\])?/, '--\\1minify-')
+    
+    def normalize_option(option)
+      option.gsub('-', '_').to_sym
+    end
+    
+    opts.on(prefixed_option, message) do |value|
+      if !options[:minify] || options[:minify] == true
+        options[:minify] = {}
+      end
+      options[:minify][normalize_option(option)] = value
+    end
+  end
+
 end
 
 opts.parse!

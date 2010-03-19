@@ -49,6 +49,7 @@ begin
     gemspec.homepage = "http://github.com/codespeaks/modulr"
     gemspec.files = FileList["Rakefile", "README.markdown", "LICENSE", "VERSION", "{lib,bin,assets,example}/**/*", "vendor/rkelly/**/*"]
     gemspec.executable = "modulrize"
+    gemspec.add_dependency("coffee_machine")
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install jeweler"
