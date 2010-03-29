@@ -32,8 +32,8 @@ module Modulr
           value = m.factory
         end
         "\n'#{m.id}': #{value}"        
-      end.join(', ')
-      "require.define({#{pairs}\n});"
+      end
+      "require.define({#{pairs.join(', ')}\n});"
     end
     
     private
