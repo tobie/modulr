@@ -83,25 +83,23 @@ module Modulr
       }
     end
     
+    def factory
+      "function(require, exports, module) {\n#{src}\n}"
+    end
+    
     def dependencies
       @dependencies ||= self.class.find_dependencies(self)
     end
     
-    def to_js_ensure(buffer = '')
+    def dependency_array
+      '[' << dependencies.map { |d| "'#{d.id}'" }.join(', ') << ']'
+    end
+    
+    def ensure(buffer = '')
       fn = "function() {\n#{src}\n}"
-      dep = dependencies.map { |d| d.id.inspect }
-      buffer << "\nrequire.ensure([#{dep.join(', ')}], #{fn});\n"
+      buffer << "\nrequire.ensure(#{dependency_array}, #{fn});\n"
     end
 
-    def to_js(buffer = '')
-      fn = "function(require, exports, module) {\n#{src}\n}"
-      buffer << "\nmodulr.cache('#{id}', #{fn});\n"
-    end
-    
-    def to_js_string(buffer = '')
-      buffer << "\nmodulr.cache('#{id}', '#{escaped_src}');\n"
-    end
-    
     protected
       def partial_path
         File.join(*terms)

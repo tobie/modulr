@@ -18,15 +18,22 @@ module Modulr
     
     def to_js(buffer = '')
       buffer << File.read(PATH_TO_MODULR_JS)
-      modules.each do |js_module|
-        if lazy_eval_module?(js_module)
-          js_module.to_js_string(buffer)
+      buffer << "\n(function(require, module) {"
+      buffer << transport
+      buffer << main.ensure
+      buffer << "})(modulr.require, {});\n"
+    end
+    
+    def transport
+      pairs = modules.map do |m|
+        if lazy_eval_module?(m)
+          value = m.escaped_src
         else
-          js_module.to_js(buffer)
+          value = m.factory
         end
-      end
-      ens = main.to_js_ensure
-      buffer << "\n(function(require, module) { #{ens} })(modulr.require, {});\n"
+        "\n'#{m.id}': #{value}"        
+      end.join(', ')
+      "require.define({#{pairs}\n});"
     end
     
     private

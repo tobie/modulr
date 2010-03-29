@@ -9,8 +9,18 @@ var modulr = (function(global) {
       _exports = {},
       _oldDir = '',
       _currentDir = '',
+      hasOwnProp = Object.prototype.hasOwnProperty,
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
-      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
+      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//,
+      DONT_ENUM_PROPERTIES = [ 
+        'constructor',
+        'toString',
+        'toLocaleString',
+        'valueOf',
+        'hasOwnProperty',
+        'isPrototypeOf',
+        'propertyIsEnumerable'
+      ];
   
   function log(str) {
     if (global.console && console.log) { console.log(str); }
@@ -85,6 +95,27 @@ var modulr = (function(global) {
     _modules[key] = fn;
   }
   
+  function _each(obj, callback) {
+    var prop;
+    for(prop in obj) {
+      if (hasOwnProp.call(obj, prop)) {
+        callback(prop, obj[prop]);
+      }
+    }
+    for (var i = 0, length = DONT_ENUM_PROPERTIES.length; i < length; i++) { 
+      prop = DONT_ENUM_PROPERTIES[i]; 
+      if (hasOwnProp.call(obj, prop)) {
+        callback(prop, obj[prop]);
+      }
+    }
+  }
+  
+  function define(moduleDescriptors) {
+    _each(moduleDescriptors, function(k, v) {
+      _modules[PREFIX + k] = v; 
+    });
+  }
+  
   function ensure(identifiers, onAvailable, onMissing) {
     for (var i = 0, length = identifiers.length; i < length; i++) {
       var identifier = identifiers[i];
@@ -100,6 +131,7 @@ var modulr = (function(global) {
     onAvailable();
   }
   
+  require.define = define;
   require.ensure = ensure;
   
   return {
