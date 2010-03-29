@@ -86,6 +86,12 @@ module Modulr
     def dependencies
       @dependencies ||= self.class.find_dependencies(self)
     end
+    
+    def to_js_ensure(buffer = '')
+      fn = "function() {\n#{src}\n}"
+      dep = dependencies.map { |d| d.id.inspect }
+      buffer << "\nrequire.ensure([#{dep.join(', ')}], #{fn});\n"
+    end
 
     def to_js(buffer = '')
       fn = "function(require, exports, module) {\n#{src}\n}"

@@ -18,13 +18,13 @@ task :spec do
   FileList["#{COMMONJS_SPEC_DIR}/{#{specs}}/program.js"].each do |spec|
     dir = File.dirname(spec)
     output = File.join(dir, 'output.js')
+    input = File.join(dir, 'input.js')
     system = File.join(dir, 'system.js')
     FileUtils.touch(system)
     begin
       puts File.basename(dir).center(80, "_")
-      File.open(output, 'w') do |f|
-        f << Modulr.ize(spec)
-      end
+      File.open(input, 'w') { |f| f << "require('program');" }
+      File.open(output, 'w') { |f| f << Modulr.ize(input) }
       system("js -f #{output}")
     rescue => e
       phase = e.is_a?(Modulr::ModulrError) ? "building" : "running"
@@ -32,6 +32,7 @@ task :spec do
       puts e.message
     ensure
       FileUtils.rm(output)
+      FileUtils.rm(input)
       FileUtils.rm(system)
       puts
       puts

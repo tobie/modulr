@@ -25,7 +25,8 @@ module Modulr
           js_module.to_js(buffer)
         end
       end
-      buffer << "\nmodulr.require('#{main.identifier}');\n"
+      ens = main.to_js_ensure
+      buffer << "\n(function(require, module) { #{ens} })(modulr.require, {});\n"
     end
     
     private

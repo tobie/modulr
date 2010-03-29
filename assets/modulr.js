@@ -85,6 +85,23 @@ var modulr = (function(global) {
     _modules[key] = fn;
   }
   
+  function ensure(identifiers, onAvailable, onMissing) {
+    for (var i = 0, length = identifiers.length; i < length; i++) {
+      var identifier = identifiers[i];
+      if (!_modules[PREFIX + identifier]) {
+        var error = new Error('Can\'t find module "' + identifier + '".')
+        if (typeof onMissing === 'function') {
+          onMissing(error);
+          return;
+        }
+        throw error;
+      }
+    }
+    onAvailable();
+  }
+  
+  require.ensure = ensure;
+  
   return {
     require: require,
     cache: cache
