@@ -9,18 +9,49 @@ var modulr = (function(global) {
       _exports = {},
       _oldDir = '',
       _currentDir = '',
-      hasOwnProp = Object.prototype.hasOwnProperty,
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
-      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//,
-      DONT_ENUM_PROPERTIES = [ 
-        'constructor',
-        'toString',
-        'toLocaleString',
-        'valueOf',
-        'hasOwnProperty',
-        'isPrototypeOf',
-        'propertyIsEnumerable'
-      ];
+      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
+      
+  var _forEach = (function() {
+    var hasOwnProp = Object.prototype.hasOwnProperty,
+        DONT_ENUM_PROPERTIES = [
+          'constructor',
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable'
+        ],
+        LENGTH = DONT_ENUM_PROPERTIES.length,
+        DONT_ENUM_BUG = true;
+    
+    function _forEach(obj, callback) {
+      for(var prop in obj) {
+        if (hasOwnProp.call(obj, prop)) {
+          callback(prop, obj[prop]);
+        }
+      }
+    }
+    
+    for(var prop in { toString: true }) {
+      DONT_ENUM_BUG = false
+    }
+    
+    if (DONT_ENUM_BUG) {
+      return function(obj, callback) {
+         _forEach(obj, callback);
+         for (var i = 0; i < LENGTH; i++) {
+           var prop = DONT_ENUM_PROPERTIES[i];
+           if (hasOwnProp.call(obj, prop)) {
+             callback(prop, obj[prop]);
+           }
+         }
+       }
+    }
+    
+    return _forEach;
+  })();
   
   function log(str) {
     if (global.console && console.log) { console.log(str); }
@@ -95,23 +126,8 @@ var modulr = (function(global) {
     _modules[key] = fn;
   }
   
-  function _each(obj, callback) {
-    var prop;
-    for(prop in obj) {
-      if (hasOwnProp.call(obj, prop)) {
-        callback(prop, obj[prop]);
-      }
-    }
-    for (var i = 0, length = DONT_ENUM_PROPERTIES.length; i < length; i++) { 
-      prop = DONT_ENUM_PROPERTIES[i]; 
-      if (hasOwnProp.call(obj, prop)) {
-        callback(prop, obj[prop]);
-      }
-    }
-  }
-  
   function define(moduleDescriptors) {
-    _each(moduleDescriptors, function(k, v) {
+    _forEach(moduleDescriptors, function(k, v) {
       _modules[PREFIX + k] = v; 
     });
   }
