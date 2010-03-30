@@ -12,7 +12,7 @@ module Modulr
       return @tree if @tree
       @tree = {}
       @stack = []
-      build_tree(@js_modules, @tree)
+      build_branch(@js_modules, @tree)
       @tree
     end
     
@@ -41,13 +41,13 @@ module Modulr
     end
     
     private
-      def build_tree(js_modules, tree)
+      def build_branch(js_modules, branch)
         js_modules.each do |m|
           id = m.id
-          tree[id] = {}
+          branch[id] = {}
           unless @stack.include?(id)
             @stack << id
-            build_tree(m.dependencies, tree[id])
+            build_branch(m.dependencies, branch[id])
           end
         end
       end
