@@ -19,10 +19,9 @@ module Modulr
     def to_js(buffer = '')
       buffer << File.read(PATH_TO_MODULR_JS)
       buffer << "\n(function(require, module) {"
-      buffer << "\nrequire.main = module;"
       buffer << transport
       buffer << main.ensure
-      buffer << "})(modulr.require, {});\n"
+      buffer << "})(modulr.require, modulr.require.main);\n"
     end
     
     def transport

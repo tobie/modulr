@@ -69,8 +69,6 @@ var modulr = (function(global) {
       _exports[key] = expts = {};
       _moduleObjects[key] = modObj = { id: id };
       
-      if (!require.main) { require.main = modObj; }
-      
       fn = _modules[key];
       _oldDir = _currentDir;
       _currentDir = id.slice(0, id.lastIndexOf('/'));
@@ -139,6 +137,7 @@ var modulr = (function(global) {
   
   require.define = define;
   require.ensure = ensure;
+  require.main = {};
   
   return {
     require: require
