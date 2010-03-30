@@ -37,7 +37,7 @@ module Modulr
         end
         
       end
-      "http://yuml.me/diagram/scruffy/class/#{dep.join(',')}."
+      "http://yuml.me/diagram/scruffy;dir:lr/class/#{dep.join(',')}."
     end
     
     private
