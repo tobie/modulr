@@ -120,9 +120,6 @@ var modulr = (function(global) {
     var key = PREFIX + id;
     
     log('Cached module "' + id + '".');
-    if (_modules[key]) {
-      throw 'Can\'t overwrite module "' + id + '".';
-    }
     _modules[key] = fn;
   }
   
