@@ -116,13 +116,6 @@ var modulr = (function(global) {
     return path.join('/');
   }
   
-  function cache(id, fn) {
-    var key = PREFIX + id;
-    
-    log('Cached module "' + id + '".');
-    _modules[key] = fn;
-  }
-  
   function define(moduleDescriptors) {
     _forEach(moduleDescriptors, function(k, v) {
       _modules[PREFIX + k] = v; 
@@ -148,7 +141,6 @@ var modulr = (function(global) {
   require.ensure = ensure;
   
   return {
-    require: require,
-    cache: cache
+    require: require
   };
 })(this);
