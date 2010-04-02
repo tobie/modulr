@@ -19,7 +19,11 @@ module Modulr
     def self.find_dependencies(js_module)
       expressions = parser.get_require_expressions(js_module.src)
       expressions.map do |exp|
-        new(exp[:identifier], js_module.root, js_module.path, exp[:line])
+        if exp[:identifier]
+          new(exp[:identifier], js_module.root, js_module.path, exp[:line])
+        else
+          raise DynamicModuleIdentifierError.new(exp[:src_code], js_module.path, exp[:line])
+        end
       end
     end
     
@@ -123,6 +127,16 @@ module Modulr
     def initialize(js_module)
       @js_module = js_module
       super("Cannot load module '#{js_module.identifier}' in #{js_module.file} at line #{js_module.line}.\nMissing file #{js_module.path}.")
+    end
+  end
+  
+  class DynamicModuleIdentifierError < ModulrError
+    attr_reader :src
+    def initialize(src, file, line)
+      @src = src
+      @file = file
+      @line = line
+      super("Cannot do a static analysis of dynamic module identifier '#{src}' in #{file} at line #{line}.")
     end
   end
 end

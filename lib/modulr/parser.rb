@@ -25,10 +25,12 @@ module Modulr
       end
       
       def normalize(node)
-        str = node.arguments.first.value.first
+        arg = node.arguments.value.first
+        valid = arg.is_a?(RKelly::Nodes::StringNode)
         {
-          :identifier => str.value[1...-1],
-          :line => str.line.to_i
+          :identifier => valid ? arg.value[1...-1] : nil,
+          :src_code => arg.to_ecma,
+          :line => arg.line.to_i
         }
       end
   end
