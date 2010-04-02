@@ -131,7 +131,7 @@ module Modulr
   end
   
   class DynamicModuleIdentifierError < ModulrError
-    attr_reader :src
+    attr_reader :src, :file, :line
     def initialize(src, file, line)
       @src = src
       @file = file
