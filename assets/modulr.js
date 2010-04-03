@@ -10,18 +10,15 @@ var modulr = (function(global) {
       _oldDir = '',
       _currentDir = '',
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
-      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
+      RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//,
+      _forEach,
+      _indexOf;
       
-  var _forEach = (function() {
+  _forEach = (function() {
     var hasOwnProp = Object.prototype.hasOwnProperty,
         DONT_ENUM_PROPERTIES = [
-          'constructor',
-          'toString',
-          'toLocaleString',
-          'valueOf',
-          'hasOwnProperty',
-          'isPrototypeOf',
-          'propertyIsEnumerable'
+          'constructor', 'toString', 'toLocaleString', 'valueOf',
+          'hasOwnProperty','isPrototypeOf', 'propertyIsEnumerable'
         ],
         LENGTH = DONT_ENUM_PROPERTIES.length,
         DONT_ENUM_BUG = true;
@@ -53,17 +50,27 @@ var modulr = (function(global) {
     return _forEach;
   })();
   
-  function log(str) {
-    if (global.console && console.log) { console.log(str); }
-  }
+  indexOf = (function() {
+    var _indexOf = Array.prototype.indexOf;
+    if (typeof indexOf === 'function') {
+      return function(array, item) {
+        return _indexOf.call(array, item);
+      }
+    }
+    
+    return function(array, item) {
+      for (var i = 0, l = array.length; i < l; i++) {
+        if (item === array[i]) { return i; }
+      }
+      return -1;
+    }
+  })();
   
   function require(identifier) {
     var fn, modObj,
         id = resolveIdentifier(identifier),
         key = PREFIX + id,
         expts = _exports[key];
-    
-    log('Required module "' + identifier + '".');
     
     if (!expts) {
       _exports[key] = expts = {};
