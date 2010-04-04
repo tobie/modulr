@@ -130,10 +130,10 @@ var modulr = (function(global) {
       // Check to see if any of the required dependencies 
       // weren't previously loaded.
       // Build an array of missing dependencies with those which weren't.
-      missingDependencies = [];
       for (var i = 0, length = dependencies.length; i < length; i++) {
         var key = PREFIX + dependencies[i];
         if (!(key in _factories) && !(key in _incompleteFactories)) {
+          missingDependencies = missingDependencies || [];
           missingDependencies.push(key);
         }
       }
