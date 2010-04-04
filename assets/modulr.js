@@ -124,7 +124,7 @@ var modulr = (function(global) {
     return path.join('/');
   }
   
-  function define(moduleDescriptors, dependencies) {
+  function define(descriptors, dependencies) {
     var missingDependencies;
     if (dependencies) {
       missingDependencies = [];
@@ -136,19 +136,19 @@ var modulr = (function(global) {
       }
     }
     if (missingDependencies) {
-      _forEach(moduleDescriptors, function(id, factory) {
+      _forEach(descriptors, function(id, factory) {
         var key = PREFIX + id;
         _dependencyGraph[key] = missingDependencies; // clone?
         _incompleteFactories[key] = factory;
       });
     } else {
-      prepare(moduleDescriptors);
+      prepare(descriptors);
       callRipeHandlers();
     }
   }
   
-  function prepare(moduleDescriptors) {
-    _forEach(moduleDescriptors, function(id, factory) {
+  function prepare(descriptors) {
+    _forEach(descriptors, function(id, factory) {
       var key = PREFIX + id;
       _factories[key] = factory;
       delete _incompleteFactories[key];
