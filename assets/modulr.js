@@ -161,7 +161,7 @@ var modulr = (function(global) {
     _forEach(_dependencyGraph, function(key, dependencies) {
       if (dependencies.length === 0) {
         newFactories = newFactories || {};
-        newFactories[k] = _incompleteFactories[key];
+        newFactories[key] = _incompleteFactories[key];
         delete _dependencyGraph[key];
       }
     });
