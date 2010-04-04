@@ -127,6 +127,9 @@ var modulr = (function(global) {
   function define(descriptors, dependencies) {
     var missingDependencies;
     if (dependencies) {
+      // Check to see if any of the required dependencies 
+      // weren't previously loaded.
+      // Build an array of missing dependencies with those which weren't.
       missingDependencies = [];
       for (var i = 0, length = dependencies.length; i < length; i++) {
         var key = PREFIX + dependencies[i];
@@ -135,28 +138,49 @@ var modulr = (function(global) {
         }
       }
     }
+    
     if (missingDependencies) {
+      // Add each newly defined descriptor to our list of
+      // factories missing dependencies.
+      // Build a dependency graph so we can handle subsequent 
+      // require.define calls easily.
       _forEach(descriptors, function(id, factory) {
         var key = PREFIX + id;
-        _dependencyGraph[key] = missingDependencies; // clone?
+        _dependencyGraph[key] = missingDependencies; // TODO clone?
         _incompleteFactories[key] = factory;
       });
+      // load the missing modules.
+      loadModules(missingDependencies);
     } else {
+      // There aren't any missing dependencies in the factories
+      // which were just defined. Lets move them to a list of
+      // synchronously requirable factories.
       prepare(descriptors);
+      // While we're at it, let's call all async handlers whose
+      // dependencies are now available.
       callRipeHandlers();
     }
   }
   
   function prepare(descriptors) {
+    // Handles factories for which all dependencies are
+    // available.
     _forEach(descriptors, function(id, factory) {
       var key = PREFIX + id;
+      // Move the factory from the list of factories missing
+      // dependencies to the list of synchronously requirable
+      // factories.
       _factories[key] = factory;
       delete _incompleteFactories[key];
+      // Go through the dependency graph and remove the factory
+      // from all of the missing dependencies lists.
       _forEach(_dependencyGraph, function(unused, dependencies) {
         var i = indexOf(i, key);
         if (i > -1) { dependencies.splice(i, 1); }
       });
     });
+    
+    // Find all the factories which no longer have missing dependencies.
     var newFactories;
     _forEach(_dependencyGraph, function(key, dependencies) {
       if (dependencies.length === 0) {
@@ -165,16 +189,21 @@ var modulr = (function(global) {
         delete _dependencyGraph[key];
       }
     });
+    // recurse!
     if (newFactories) { prepare(newFactories); }
   }
   
   function ensure(dependencies, callback, errorCallback) {
+    // Cache this new handler.
     _handlers.push({
       dependencies: dependencies,
       callback: callback,
       errorCallback: errorCallback
     });
-
+    
+    // Immediately callRipeHandlers(): you never know,
+    // all of the required dependencies might be already
+    // available.
     callRipeHandlers();
   }
   
@@ -182,11 +211,14 @@ var modulr = (function(global) {
     var missingFactories;
     
     for (var i = 0, length = _handlers.length; i < length; i++) {
+      // Go through all of the stored handlers.
       var handler = _handlers[i],
           dependencies = handler.dependencies,
           isRipe = true;
       for (var j = 0, reqLength = dependencies.length; j < reqLength; j++) {
         var id = dependencies[j];
+        // If any dependency is missing, the handler isn't ready to be called.
+        // Store those missing so we can later inform the loader.
         if (!_factories[PREFIX + id]) {
           missingFactories = missingFactories || [];
           if (indexOf(missingFactories, id) < 0) {
