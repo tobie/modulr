@@ -4,9 +4,12 @@
 //   http://github.com/codespeaks/modulr/blob/master/LICENSE
 
 var modulr = (function(global) {
-  var _modules = {},
-      _moduleObjects = {},
+  var _dependencyGraph = {},
+      _incompleteFactories = {},
+      _factories = {},
+      _modules = {},
       _exports = {},
+      _handlers = [],
       _oldDir = '',
       _currentDir = '',
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
@@ -59,7 +62,7 @@ var modulr = (function(global) {
     }
     
     return function(array, item) {
-      for (var i = 0, l = array.length; i < l; i++) {
+      for (var i = 0, length = array.length; i < length; i++) {
         if (item === array[i]) { return i; }
       }
       return -1;
@@ -67,16 +70,16 @@ var modulr = (function(global) {
   })();
   
   function require(identifier) {
-    var fn, modObj,
+    var fn, mod,
         id = resolveIdentifier(identifier),
         key = PREFIX + id,
         expts = _exports[key];
     
     if (!expts) {
       _exports[key] = expts = {};
-      _moduleObjects[key] = modObj = { id: id };
+      _modules[key] = mod = { id: id };
       
-      fn = _modules[key];
+      fn = _factories[key];
       _oldDir = _currentDir;
       _currentDir = id.slice(0, id.lastIndexOf('/'));
       
@@ -85,7 +88,7 @@ var modulr = (function(global) {
         if (typeof fn === 'string') {
           fn = new Function('require', 'exports', 'module', fn);
         }
-        fn(require, expts, modObj);
+        fn(require, expts, mod);
         _currentDir = _oldDir;
       } catch(e) {
         _currentDir = _oldDir;
@@ -121,25 +124,90 @@ var modulr = (function(global) {
     return path.join('/');
   }
   
-  function define(moduleDescriptors) {
-    _forEach(moduleDescriptors, function(k, v) {
-      _modules[PREFIX + k] = v; 
-    });
-  }
-  
-  function ensure(identifiers, onAvailable, onMissing) {
-    for (var i = 0, length = identifiers.length; i < length; i++) {
-      var identifier = identifiers[i];
-      if (!_modules[PREFIX + identifier]) {
-        var error = new Error('Can\'t find module "' + identifier + '".')
-        if (typeof onMissing === 'function') {
-          onMissing(error);
-          return;
+  function define(moduleDescriptors, dependencies) {
+    var missingDependencies, key;
+    if (dependencies) {
+      missingDependencies = [];
+      for (var i = 0, length = dependencies.length; i < length; i++) {
+        key = PREFIX + dependencies[i];
+        if (!(key in _factories) && !(key in _incompleteFactories)) {
+          missingDependencies.push(key);
         }
-        throw error;
       }
     }
-    onAvailable();
+    if (missingDependencies) {
+      _forEach(moduleDescriptors, function(id, factory) {
+        key = PREFIX + id;
+        _dependencyGraph[key] = missingDependencies; // clone?
+        _incompleteFactories[key] = factory;
+      });
+    } else {
+      prepare(moduleDescriptors);
+      callRipeHandlers();
+    }
+  }
+  
+  function prepare(moduleDescriptors) {
+    _forEach(moduleDescriptors, function(id, factory) {
+      var key = PREFIX + id;
+      _factories[key] = factory;
+      delete _incompleteFactories[key];
+      _forEach(_dependencyGraph, function(unused, dependencies) {
+        var i = indexOf(i, key);
+        if (i > -1) { dependencies.splice(i, 1); }
+      });
+    });
+    var newFactories;
+    _forEach(_dependencyGraph, function(key, dependencies) {
+      if (dependencies.length === 0) {
+        newFactories = newFactories || {};
+        newFactories[k] = _incompleteFactories[key];
+        delete _dependencyGraph[key];
+      }
+    });
+    if (newFactories) { prepare(newFactories); }
+  }
+  
+  function ensure(dependencies, callback, errorCallback) {
+    _handlers.push({
+      dependencies: dependencies,
+      callback: callback,
+      errorCallback: errorCallback
+    });
+
+    callRipeHandlers();
+  }
+  
+  function callRipeHandlers() {
+    var missingFactories;
+    
+    for (var i = 0, length = _handlers.length; i < length; i++) {
+      var handler = _handlers[i],
+          dependencies = handler.dependencies,
+          isRipe = true;
+      for (var j = 0, reqLength = dependencies.length; j < reqLength; j++) {
+        var id = dependencies[j];
+        if (!_factories[PREFIX + id]) {
+          missingFactories = missingFactories || [];
+          if (indexOf(missingFactories, id) < 0) {
+            missingFactories.push(id);
+          }
+          isRipe = false;
+        }
+      }
+      
+      if (isRipe) {
+        handler.callback(); // TODO error handling
+      }
+    }
+    
+    if (missingFactories) {
+      loadModules(missingFactories);
+    }
+  }
+  
+  function loadModules(factories) {
+    console.log(factories);
   }
   
   require.define = define;
