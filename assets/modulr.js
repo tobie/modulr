@@ -5,6 +5,7 @@
 
 var modulr = (function(global) {
   var _dependencyGraph = {},
+      _loadingFactories = {},
       _incompleteFactories = {},
       _factories = {},
       _modules = {},
@@ -239,7 +240,17 @@ var modulr = (function(global) {
   }
   
   function loadModules(factories) {
-    console.log(factories);
+    var missingFactories;
+    for (var i = 0, length = factories.length; i < length; i++) {
+      var factory = factories[i];
+      if (!(factory in _loadingFactories)) {
+        missingFactories = missingFactories || [];
+        missingFactories.push(factory);
+      }
+    }
+    if (missingFactories) {
+      console.log(missingFactories);
+    }
   }
   
   require.define = define;
