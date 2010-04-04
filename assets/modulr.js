@@ -125,11 +125,11 @@ var modulr = (function(global) {
   }
   
   function define(moduleDescriptors, dependencies) {
-    var missingDependencies, key;
+    var missingDependencies;
     if (dependencies) {
       missingDependencies = [];
       for (var i = 0, length = dependencies.length; i < length; i++) {
-        key = PREFIX + dependencies[i];
+        var key = PREFIX + dependencies[i];
         if (!(key in _factories) && !(key in _incompleteFactories)) {
           missingDependencies.push(key);
         }
@@ -137,7 +137,7 @@ var modulr = (function(global) {
     }
     if (missingDependencies) {
       _forEach(moduleDescriptors, function(id, factory) {
-        key = PREFIX + id;
+        var key = PREFIX + id;
         _dependencyGraph[key] = missingDependencies; // clone?
         _incompleteFactories[key] = factory;
       });
