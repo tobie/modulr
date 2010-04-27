@@ -54,11 +54,11 @@ var modulr = (function(global) {
     return _forEach;
   })();
   
-  indexOf = (function() {
-    var _indexOf = Array.prototype.indexOf;
-    if (typeof indexOf === 'function') {
+  _indexOf = (function() {
+    var nativeIndexOf = Array.prototype.indexOf;
+    if (typeof nativeIndexOf === 'function') {
       return function(array, item) {
-        return _indexOf.call(array, item);
+        return nativeIndexOf.call(array, item);
       }
     }
     
@@ -176,7 +176,7 @@ var modulr = (function(global) {
       // Go through the dependency graph and remove the factory
       // from all of the missing dependencies lists.
       _forEach(_dependencyGraph, function(unused, dependencies) {
-        var i = indexOf(i, key);
+        var i = _indexOf(i, key);
         if (i > -1) { dependencies.splice(i, 1); }
       });
     });
@@ -222,7 +222,7 @@ var modulr = (function(global) {
         // Store those missing so we can later inform the loader.
         if (!_factories[PREFIX + id]) {
           missingFactories = missingFactories || [];
-          if (indexOf(missingFactories, id) < 0) {
+          if (_indexOf(missingFactories, id) < 0) {
             missingFactories.push(id);
           }
           isRipe = false;
