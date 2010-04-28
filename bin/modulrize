@@ -31,6 +31,10 @@ opts = OptionParser.new do |opts|
     options[:minify] = minify
   end
   
+  opts.on('--global-export=GLOBAL_VAR', 'Export main module\'s exports to the GLOBAL_VAR global variable.') do |global|
+    options[:global] = global
+  end
+  
   opts.on('-h', '--help', 'Show this message.') do
     puts opts
     exit
