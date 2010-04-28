@@ -10,7 +10,7 @@ module Modulr
   require 'modulr/js_module'
   require 'modulr/parser'
   require 'modulr/collector'
-  require 'modulr/globalize_collector'
+  require 'modulr/global_export_collector'
   require 'modulr/minifier'
   require 'modulr/version'
   
@@ -23,9 +23,10 @@ module Modulr
     minify(collector.to_js, options[:minify])
   end
   
-  def self.globalize(input_filename, options = {})
-    collector = GlobalizeCollector.new(options)
-    collector.parse_file(input_filename)
+  def self.export_module_to_global_variable(js_module, global, options = {})
+    options[:global] = global
+    collector = GlobalExportCollector.new(options)
+    collector.parse_file(js_module)
     minify(collector.to_js, options[:minify])
   end
   

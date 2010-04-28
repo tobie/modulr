@@ -1,5 +1,5 @@
 module Modulr
-  class GlobalizeCollector < Collector
+  class GlobalExportCollector < Collector
     
     def initialize(options = {})
       @global = options[:global]

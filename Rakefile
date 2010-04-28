@@ -14,7 +14,7 @@ end
 desc "Concatenate synchronous example file"
 task :build_sync_example do
   File.open(File.join('output', 'example.js'), 'w') do |f|
-    f << Modulr.globalize(File.join('example', 'program.js'), { :global => 'foo' })
+    f << Modulr.export_module_to_global_variable(File.join('example', 'program.js'), 'foo')
   end
 end
 desc "Run CommonJS Module 1.0 specs"
