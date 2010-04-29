@@ -1,3 +1,4 @@
+require 'uri'
 module Modulr
   class DependencyGraph
     def initialize(js_modules)
@@ -23,7 +24,12 @@ module Modulr
       @list
     end
     
-    def to_yuml
+    def to_yuml(options = {})
+      options = options.merge({
+        :extension => 'png',
+        :direction => 'lr',
+        :scruffy => true
+      })
       dep = @js_modules.map { |m| "[#{m.id}]" }
       to_list.map do |k, v|
         if v
@@ -35,9 +41,14 @@ module Modulr
             end
           end
         end
-        
       end
-      "http://yuml.me/diagram/scruffy;dir:lr/class/#{dep.join(',')}."
+      uri = "http://yuml.me/diagram/"
+      uri << "scruffy;" if options[:scruffy]
+      uri << "dir:#{options[:direction]}/class/"
+      uri << dep.join(',')
+      uri << ".#{options[:extension]}"
+      URI.encode(uri).gsub('[', '%5B').gsub(']', '%5D')
+      
     end
     
     private
