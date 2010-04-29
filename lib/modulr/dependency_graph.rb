@@ -24,7 +24,7 @@ module Modulr
     end
     
     def to_yuml
-      dep = []
+      dep = @js_modules.map { |m| "[#{m.id}]" }
       to_list.map do |k, v|
         if v
           v.each do |i|
