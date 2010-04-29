@@ -17,10 +17,10 @@ task :build_sync_example do
     f << Modulr.ize(File.join('example', 'program.js'), { :global => 'foo' })
   end
 end
+
 desc "Run CommonJS Module 1.0 specs"
 task :spec do
   specs = ENV["SPECS"] || "**"
-  
   FileList["#{COMMONJS_SPEC_DIR}/{#{specs}}/program.js"].each do |spec|
     dir = File.dirname(spec)
     output = File.join(dir, 'output.js')
