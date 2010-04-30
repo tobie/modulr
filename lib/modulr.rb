@@ -33,9 +33,9 @@ module Modulr
     dir = File.dirname(file)
     mod_name = File.basename(file, '.js')
     mod = JSModule.new(mod_name, dir, file)
-    uri = DependencyGraph.new(mod).to_yuml
-    output = options[:dependency_graph]
-    if output == true
+    output = options.delete(:dependency_graph)
+    uri = DependencyGraph.new(mod).to_yuml(options)
+    if !output || output == true
       output = "#{dir}/#{mod_name}.png"
     end
     File.open(output, 'w').write(open(uri).read)
