@@ -25,11 +25,12 @@ module Modulr
     end
     
     def to_yuml(options = {})
-      options = options.merge({
-        :extension => 'png',
-        :direction => 'lr',
+      options = {
+        :ext => 'png',
+        :dir => 'lr',
+        :scale => 100,
         :scruffy => true
-      })
+      }.merge(options)
       dep = @js_modules.map { |m| "[#{m.id}]" }
       to_list.map do |k, v|
         if v
@@ -42,13 +43,17 @@ module Modulr
           end
         end
       end
-      uri = "http://yuml.me/diagram/"
-      uri << "scruffy;" if options[:scruffy]
-      uri << "dir:#{options[:direction]}/class/"
-      uri << dep.join(',')
-      uri << ".#{options[:extension]}"
-      URI.encode(uri).gsub('[', '%5B').gsub(']', '%5D')
+      opts = []
+      opts << "scruffy" if options[:scruffy]
+      opts << "dir:#{options[:dir]}"
+      opts << "scale:#{options[:scale]}"
       
+      uri = "http://yuml.me/diagram/"
+      uri << opts.join(';')
+      uri << "/class/"
+      uri << dep.join(',')
+      uri << ".#{options[:ext]}"
+      URI.encode(uri).gsub('[', '%5B').gsub(']', '%5D')
     end
     
     private
