@@ -11,8 +11,7 @@ var modulr = (function(global) {
       _modules = {},
       _exports = {},
       _handlers = [],
-      _oldDir = '',
-      _currentDir = '',
+      _dirStack = [],
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
       RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//,
       _forEach,
@@ -81,18 +80,16 @@ var modulr = (function(global) {
       _modules[key] = mod = { id: id };
       
       fn = _factories[key];
-      _oldDir = _currentDir;
-      _currentDir = id.slice(0, id.lastIndexOf('/'));
-      
+      _dirStack.push(id.substring(0, id.lastIndexOf('/') + 1))
       try {
         if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
         if (typeof fn === 'string') {
           fn = new Function('require', 'exports', 'module', fn);
         }
         fn(require, expts, mod);
-        _currentDir = _oldDir;
+        _dirStack.pop();
       } catch(e) {
-        _currentDir = _oldDir;
+        _dirStack.pop();
         // We'd use a finally statement here if it wasn't for IE.
         throw e;
       }
@@ -101,13 +98,13 @@ var modulr = (function(global) {
   }
   
   function resolveIdentifier(identifier) {
-    var parts, part, path;
+    var dir, parts, part, path;
     
     if (!RELATIVE_IDENTIFIER_PATTERN.test(identifier)) {
       return identifier;
     }
-    
-    parts = (_currentDir + '/' + identifier).split('/');
+    dir = _dirStack[_dirStack.length - 1]
+    parts = (dir + identifier).split('/');
     path = [];
     for (var i = 0, length = parts.length; i < length; i++) {
       part = parts[i];
