@@ -4,7 +4,12 @@ module Modulr
   class Parser
     
     def parse(src)
-      parser.parse(src)
+      begin
+        ast = parser.parse(src)
+      rescue RKelly::SyntaxError
+        raise ParserError
+      end
+      raise ParserError unless ast
     end
     
     def get_require_expressions(src)
@@ -33,5 +38,8 @@ module Modulr
           :line => arg.line.to_i
         }
       end
+  end
+  
+  class ParserError < ModulrError
   end
 end

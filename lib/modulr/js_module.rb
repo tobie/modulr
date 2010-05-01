@@ -17,7 +17,11 @@ module Modulr
     end
     
     def self.find_dependencies(js_module)
-      expressions = parser.get_require_expressions(js_module.src)
+      begin
+        expressions = parser.get_require_expressions(js_module.src)
+      rescue ParserError
+        raise JavaScriptSyntaxError, js_module
+      end
       expressions.map do |exp|
         if exp[:identifier]
           new(exp[:identifier], js_module.root, js_module.path, exp[:line])
@@ -137,6 +141,14 @@ module Modulr
       @file = file
       @line = line
       super("Cannot do a static analysis of dynamic module identifier '#{src}' in #{file} at line #{line}.")
+    end
+  end
+  
+  class JavaScriptSyntaxError < ModulrError
+    attr_reader :js_module
+    def initialize(js_module)
+      @js_module = js_module
+      super("JavaScript Syntax Error in #{js_module.file}.")
     end
   end
 end
