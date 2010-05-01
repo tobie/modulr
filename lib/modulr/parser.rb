@@ -10,6 +10,7 @@ module Modulr
         raise ParserError
       end
       raise ParserError unless ast
+      ast
     end
     
     def get_require_expressions(src)
