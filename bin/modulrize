@@ -36,8 +36,8 @@ opts = OptionParser.new do |opts|
   end
   
   opts.on('--dependency-graph[=OUTPUT]', 'Create a dependency graph of the module.') do |output|
-    output = true unless output
-    options[:dependency_graph] = output
+    options[:dependency_graph] = true
+    options[:output] = output
   end
   
   opts.on('-h', '--help', 'Show this message.') do
@@ -80,7 +80,7 @@ begin
     puts opts
     exit 1
   end
-  if options[:dependency_graph]
+  if options.delete(:dependency_graph)
     result = Modulr.graph(ARGV.first, options)
   else
     result = Modulr.ize(ARGV.first, options)
