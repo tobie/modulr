@@ -11,7 +11,7 @@ var modulr = (function(global) {
       _modules = {},
       _exports = {},
       _handlers = [],
-      _dirStack = [],
+      _dirStack = [''],
       PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
       RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//,
       _forEach,
@@ -103,7 +103,7 @@ var modulr = (function(global) {
     if (!RELATIVE_IDENTIFIER_PATTERN.test(identifier)) {
       return identifier;
     }
-    dir = _dirStack[_dirStack.length - 1] || '';
+    dir = _dirStack[_dirStack.length - 1];
     parts = (dir + identifier).split('/');
     path = [];
     for (var i = 0, length = parts.length; i < length; i++) {
