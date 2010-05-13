@@ -9,7 +9,7 @@ in Ruby for client-side JavaScript. It accepts a singular file as input (the _pr
 which is does static analysis to recursively resolve its dependencies.
 
 The program, its dependencies and a small, namespaced JavaScript library are
-concatenated into a single `js` file. This improves load times by
+concatenated into a single `js` file with optional minification through the [YUI Compressor](http://developer.yahoo.com/yui/compressor/). This improves load times by
 [minimizing HTTP requests](http://developer.yahoo.com/performance/rules.html#num_http).
 Further load time performance improvements are made possible by the built-in
 [lazy evaluation](http://googlecode.blogspot.com/2009/09/gmail-for-mobile-html5-series-reducing.html)
@@ -17,7 +17,12 @@ option. Modules are delivered as JavaScript strings--instead of functions--and a
 evaluated only when required.
 
 The bundled JavaScript library provides each module with the necessary `require`
-function and `exports` and `module` free variables.
+function and `exports` and `module` free variables. In its full version, the bundled
+library also provided support for the [`require.ensure`](http://wiki.commonjs.org/wiki/Modules/Async/A) (async module requires) and [`require.define`](http://wiki.commonjs.org/wiki/Modules/Transport/D) (module transport) methods.
+
+`modulr` can also be used as a build tool for JavaScript code that will be executed in a regular JS environment. In this case, the global variable defined by the `--global-export` option is assigned the `exports` of the main CommonJS module and asynchronous module requires are not supported.
+
+Finally, `modulr` allows you to create handy [dependency graphs](http://modulrjs.org/spec_dependency_graph.html).
 
 * [Github repository](http://github.com/codespeaks/modulr)
 * [Specification](http://wiki.commonjs.org/wiki/Modules/1.0)
@@ -36,9 +41,24 @@ To process a JavaScript source file, just run:
 
     $ modulrize filename.js > output.js
 
-For a comprehensive list of options:
+Options are as follows:
 
-    $ modulrize --help"
+    -o, --output=FILE                Write the output to FILE. Defaults to stdout.
+    -r, --root=DIR                   Set DIR as root directory. Defaults to the directory containing FILE.
+        --lazy-eval [MODULES]        Enable lazy evaluation of all JS modules or of those specified by MODULES.
+                                     MODULES accepts a comma-separated list of identifiers.
+        --minify                     Minify output using YUI Compressor.
+        --global-export=GLOBAL_VAR   Export main module's exports to the GLOBAL_VAR global variable.
+        --dependency-graph[=OUTPUT]  Create a dependency graph of the module.
+    -h, --help                       Show this message.
+
+Minification options (these are forwarded to YUI Compressor without the "minify-" prefix):
+
+    --minify-disable-optimizations   Disable all micro optimizations.
+    --minify-nomunge             Minify only, do not obfuscate.
+    --minify-verbose             Display informational messages and warnings.
+    --minify-line-break COLUMN   Insert a line break after the specified column number.
+    --minify-preserve-semi       Preserve all semicolons.
 
 Specs
 -----
