@@ -1,4 +1,5 @@
 require 'rkelly'
+require 'modulr/error'
 
 module Modulr
   class Parser

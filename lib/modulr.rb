@@ -4,9 +4,6 @@ module Modulr
   $:.unshift(LIB_DIR)
   $:.unshift(PARSER_DIR)
   
-  class ModulrError < StandardError
-  end
-  
   require 'modulr/js_module'
   require 'modulr/parser'
   require 'modulr/collector'

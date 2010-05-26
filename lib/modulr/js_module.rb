@@ -1,3 +1,4 @@
+require 'modulr/error'
 module Modulr
   class JSModule
     include Comparable
