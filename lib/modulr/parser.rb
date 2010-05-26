@@ -26,7 +26,8 @@ module Modulr
       end
       
       def is_a_require_expression?(node)
-        node.is_a?(RKelly::Nodes::FunctionCallNode) &&
+        (node.is_a?(RKelly::Nodes::FunctionCallNode) ||
+        node.is_a?(RKelly::Nodes::NewExprNode)) &&
         node.value.is_a?(RKelly::Nodes::ResolveNode) &&
         node.value.value == 'require'
       end
