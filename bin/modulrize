@@ -91,5 +91,5 @@ begin
     output.print(result)
   end
 ensure
-  output.close
+  output.close if output.respond_to?(:close)
 end
