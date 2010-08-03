@@ -35,6 +35,10 @@ opts = OptionParser.new do |opts|
     options[:global] = global
   end
   
+  opts.on('--sync', 'Load all dependencies synchronously.') do |global|
+    options[:sync] = true
+  end
+  
   opts.on('--dependency-graph[=OUTPUT]', 'Create a dependency graph of the module.') do |output|
     options[:dependency_graph] = true
     options[:output] = output

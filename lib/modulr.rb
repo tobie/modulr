@@ -7,6 +7,7 @@ module Modulr
   require 'modulr/js_module'
   require 'modulr/parser'
   require 'modulr/collector'
+  require 'modulr/sync_collector'
   require 'modulr/global_export_collector'
   require 'modulr/minifier'
   require 'modulr/dependency_graph'
@@ -19,6 +20,8 @@ module Modulr
   def self.ize(input_filename, options = {})
     if options[:global]
       collector = GlobalExportCollector.new(options)
+    elsif options[:sync]
+      collector = SyncCollector.new(options)
     else
       collector = Collector.new(options)
     end
