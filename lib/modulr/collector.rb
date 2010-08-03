@@ -12,7 +12,6 @@ module Modulr
       @src = File.read(path)
       @root ||= File.dirname(path)
       @main = JSModule.new(File.basename(path, '.js'), @root, path)
-      modules << main
       collect_dependencies(main)
     end
     
