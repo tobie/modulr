@@ -49,6 +49,7 @@ Options are as follows:
                                      MODULES accepts a comma-separated list of identifiers.
         --minify                     Minify output using YUI Compressor.
         --global-export=GLOBAL_VAR   Export main module's exports to the GLOBAL_VAR global variable.
+        --sync                       Avoid using require.ensure.
         --dependency-graph[=OUTPUT]  Create a dependency graph of the module.
     -h, --help                       Show this message.
 
