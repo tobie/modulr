@@ -1,23 +1,26 @@
 module Modulr
   class GlobalExportCollector < SyncCollector
     
-    def initialize(options = {})
-      @global = options[:global]
-      super
-    end
-    
     private
+      def global_var_name
+        @options[:global]
+      end
+      
+      def use_module_id_as_var_name?
+        @options[:global] == true
+      end
+      
       def globals
-        if @global == true
-          top_level_modules.map { |m| define_global(m.id) }.join
+        if use_module_id_as_var_name?
+          top_level_modules.map { |m| define_global_var(m.id) }.join
         else
-          define_global(@global)
+          define_global_var(global_var_name)
         end
       end
     
-      def define_global(global)
-        if global.include?('.')
-          props = global.split('.')
+      def define_global_var(var_name)
+        if var_name.include?('.')
+          props = var_name.split('.')
           str = props.shift
           results = "var #{str};"
           props.each do |prop|
@@ -26,23 +29,22 @@ module Modulr
           end
           "#{results}\n#{str};\n"
         else
-          "var #{global};\n"
+          "var #{var_name};\n"
         end
       end
     
       def requires
-        if @global == true
-          top_level_modules.map do |m|
-            "\n  #{m.id} = require('#{m.id}');"
-          end.join
+        if use_module_id_as_var_name?
+          top_level_modules.inject('') do |str, m|
+            str << "\n  #{m.id} = require('#{m.id}');"
+          end
+        elsif top_level_modules.size == 1
+          #export to named global
+          "\n  #{global_var_name} = require('#{top_level_modules.first.id}');"
         else
-          if top_level_modules.size == 1 #export to named global
-            "\n  #{@global} = require('#{top_level_modules.first.id}');"
-          else
-            #export to props of named global
-            top_level_modules.inject("\n#{@global} = {};") do |str, m|
-              str << "\n  #{@global}.#{m.id} = require('#{m.id}');"
-            end
+          #export to props of named global
+          top_level_modules.inject("\n#{global_var_name} = {};") do |str, m|
+            str << "\n  #{global_var_name}.#{m.id} = require('#{m.id}');"
           end
         end
       end

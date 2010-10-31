@@ -3,6 +3,7 @@ module Modulr
     attr_reader :modules, :top_level_modules
     
     def initialize(options = {})
+      @options = options
       @root = options[:root]
       @lazy_eval = options[:lazy_eval]
       @modules = []
@@ -41,7 +42,7 @@ module Modulr
         root = @root || File.dirname(path)
         JSModule.new(identifier, root, path)
       end
-    
+      
       def add_module_from_path(path)
         js_module = module_from_path(path)
         top_level_modules << js_module
