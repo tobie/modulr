@@ -7,9 +7,14 @@ module Modulr
     
     private
       def lib
-        File.read(PATH_TO_MODULR_SYNC_JS)
+        output = File.read(PATH_TO_MODULR_SYNC_JS)
+        if top_level_modules.size > 1
+          output << "\nvar module = {};\n"
+          output << "\nrequire.main = module;\n"
+        end
+        output
       end
-    
+      
       def requires
         top_level_modules.map { |m| "\n  require('#{m.id}');" }.join
       end
