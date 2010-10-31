@@ -5,15 +5,14 @@ module Modulr
       modules << js_module unless modules.include?(js_module)
     end
     
-    def lib
-      File.read(PATH_TO_MODULR_SYNC_JS)
-    end
-    private :lib
+    private
+      def lib
+        File.read(PATH_TO_MODULR_SYNC_JS)
+      end
     
-    def requires
-      top_level_modules.map { |m| "\n  require('#{m.id}');" }.join
-    end
-    private :requires
-    
+      def requires
+        top_level_modules.map { |m| "\n  require('#{m.id}');" }.join
+      end
+
   end
 end
