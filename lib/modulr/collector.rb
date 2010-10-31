@@ -15,6 +15,7 @@ module Modulr
       buffer << "\n(function() {"
       buffer << lib
       buffer << transport
+      reorder_top_level_modules
       buffer << requires
       buffer << "})();\n"
     end
@@ -35,6 +36,24 @@ module Modulr
       def reset
         modules.clear
         top_level_modules.clear
+      end
+      
+      def main_module?
+        !!main_module
+      end
+
+      def main_module
+        if mm_id = @options[:main_module]
+          @top_level_modules.find { |m| m.id == mm_id }
+        end
+      end
+
+      def reorder_top_level_modules
+        if mm = main_module
+          index = top_level_modules.index(mm)
+          top_level_modules[index] = top_level_modules[0]
+          top_level_modules[0] = mm
+        end
       end
       
       def module_from_path(path)

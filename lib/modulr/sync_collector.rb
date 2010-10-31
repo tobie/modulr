@@ -8,7 +8,7 @@ module Modulr
     private
       def lib
         output = File.read(PATH_TO_MODULR_SYNC_JS)
-        if top_level_modules.size > 1
+        if top_level_modules.size > 1 && !main_module?
           output << "\nvar module = {};\n"
           output << "\nrequire.main = module;\n"
         end
@@ -18,6 +18,5 @@ module Modulr
       def requires
         top_level_modules.map { |m| "\n  require('#{m.id}');" }.join
       end
-
   end
 end

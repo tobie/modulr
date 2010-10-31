@@ -35,6 +35,10 @@ opts = OptionParser.new do |opts|
     options[:global] = global || true
   end
   
+  opts.on('--main-module=MAIN_MODULE', 'Set the identifier of the main module (available through `require.main`).') do |main_module|
+    options[:main_module] = main_module
+  end
+  
   opts.on('--sync', 'Load all dependencies synchronously.') do |global|
     options[:sync] = true
   end

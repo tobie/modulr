@@ -55,6 +55,7 @@ Options are as follows:
         --global-export[=GLOBAL_VAR] If GLOBAL_VAR is specified and only one module is being processed, exports it to the GLOBAL_VAR global variable.
                                      If GLOBAL_VAR is specified and multiple modules are being processed, exports each one of them as a property of GLOBAL_VAR.
                                      If GLOBAL_VAR isn't specified, exports the module to global variables corresponding to their identifier.
+        --main-module=MAIN_MODULE    Set the identifier of the main module (available through `require.main`).
         --sync                       Load all dependencies synchronously.
         --dependency-graph[=OUTPUT]  Create a dependency graph of the module.
     -h, --help                       Show this message.
