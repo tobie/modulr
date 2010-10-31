@@ -35,9 +35,7 @@ module Modulr
     
       def requires
         if use_module_id_as_var_name?
-          top_level_modules.inject('') do |str, m|
-            str << "\n  #{m.id} = require('#{m.id}');"
-          end
+          top_level_modules.map { |m| "\n  #{m.id} = require('#{m.id}');" }.join
         elsif top_level_modules.size == 1
           #export to named global
           "\n  #{global_var_name} = require('#{top_level_modules.first.id}');"
