@@ -41,6 +41,10 @@ To process a JavaScript source file, just run:
 
     $ modulrize filename.js > output.js
 
+You can also simultaneously process multiples files like so:
+
+    $ modulrize filename.js other_filename.js > output.js
+
 Options are as follows:
 
     -o, --output=FILE                Write the output to FILE. Defaults to stdout.
@@ -48,18 +52,21 @@ Options are as follows:
         --lazy-eval [MODULES]        Enable lazy evaluation of all JS modules or of those specified by MODULES.
                                      MODULES accepts a comma-separated list of identifiers.
         --minify                     Minify output using YUI Compressor.
-        --global-export=GLOBAL_VAR   Export main module's exports to the GLOBAL_VAR global variable.
-        --sync                       Avoid using require.ensure.
+        --global-export[=GLOBAL_VAR] If GLOBAL_VAR is specified and only one module is being processed, exports it to the GLOBAL_VAR global variable.
+                                     If GLOBAL_VAR is specified and multiple modules are being processed, exports each one of them as a property of GLOBAL_VAR.
+                                     If GLOBAL_VAR isn't specified, exports the module to global variables corresponding to their identifier.
+        --sync                       Load all dependencies synchronously.
         --dependency-graph[=OUTPUT]  Create a dependency graph of the module.
     -h, --help                       Show this message.
 
 Minification options (these are forwarded to YUI Compressor without the "minify-" prefix):
 
     --minify-disable-optimizations   Disable all micro optimizations.
-    --minify-nomunge             Minify only, do not obfuscate.
-    --minify-verbose             Display informational messages and warnings.
-    --minify-line-break COLUMN   Insert a line break after the specified column number.
-    --minify-preserve-semi       Preserve all semicolons.
+    --minify-nomunge                 Minify only, do not obfuscate.
+    --minify-verbose                 Display informational messages and warnings.
+    --minify-line-break COLUMN       Insert a line break after the specified column number.
+    --minify-preserve-semi           Preserve all semicolons.
+
 
 Specs
 -----

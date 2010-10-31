@@ -1,27 +1,70 @@
 module Modulr
   class Collector
-    attr_reader :modules, :main
+    attr_reader :modules, :top_level_modules
     
     def initialize(options = {})
       @root = options[:root]
       @lazy_eval = options[:lazy_eval]
       @modules = []
+      @top_level_modules = []
     end
     
     def parse_file(path)
-      @src = File.read(path)
-      @root ||= File.dirname(path)
-      @main = JSModule.new(File.basename(path, '.js'), @root, path)
-      collect_dependencies(main)
+      parse_files(path)
     end
     
-    def to_js(buffer = '')
-      buffer << File.read(PATH_TO_MODULR_JS)
-      buffer << "\n(function(require, module) {"
-      buffer << transport
-      buffer << main.ensure
-      buffer << "})(modulr.require, modulr.require.main);\n"
+    def parse_files(*paths)
+      reset
+      paths.each do |path|
+        add_module_from_path(path)
+      end
     end
+    
+    def reset
+      modules.clear
+      top_level_modules.clear
+    end
+    private :reset
+    
+    def module_from_path(path)
+      identifier = File.basename(path, '.js')
+      root = @root || File.dirname(path)
+      JSModule.new(identifier, root, path)
+    end
+    private :module_from_path
+    
+    def add_module_from_path(path)
+      js_module = module_from_path(path)
+      top_level_modules << js_module
+      collect_dependencies(js_module)
+      js_module
+    end
+    private :add_module_from_path
+    
+    def to_js(buffer = '')
+      buffer << globals
+      buffer << "\n(function() {"
+      buffer << lib
+      buffer << transport
+      buffer << requires
+      buffer << "})();\n"
+    end
+    
+    def lib
+      src = File.read(PATH_TO_MODULR_JS)
+      "#{src}\nvar require = modulr.require, module = require.main;\n"
+    end
+    private :lib
+    
+    def requires
+      top_level_modules.map { |m| m.ensure }.join("\n")
+    end
+    private :requires
+    
+    def globals
+      ''
+    end
+    private :globals
     
     def transport
       pairs = modules.map do |m|
@@ -34,6 +77,7 @@ module Modulr
       end
       "require.define({#{pairs.join(', ')}\n});"
     end
+    private :transport
     
     private
       def collect_dependencies(js_module)

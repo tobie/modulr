@@ -17,7 +17,10 @@ module Modulr
   PATH_TO_MODULR_JS = File.join(LIB_DIR, '..', 'assets', 'modulr.js')
   PATH_TO_MODULR_SYNC_JS = File.join(LIB_DIR, '..', 'assets', 'modulr.sync.js')
   
-  def self.ize(input_filename, options = {})
+  def self.ize(*args)
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    input_files = args
+    
     if options[:global]
       collector = GlobalExportCollector.new(options)
     elsif options[:sync]
@@ -25,7 +28,8 @@ module Modulr
     else
       collector = Collector.new(options)
     end
-    collector.parse_file(input_filename)
+    
+    collector.parse_files(*input_files)
     minify(collector.to_js, options[:minify])
   end
   

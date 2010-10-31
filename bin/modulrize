@@ -31,8 +31,8 @@ opts = OptionParser.new do |opts|
     options[:minify] = minify
   end
   
-  opts.on('--global-export=GLOBAL_VAR', 'Export main module\'s exports to the GLOBAL_VAR global variable.') do |global|
-    options[:global] = global
+  opts.on('--global-export[=GLOBAL_VAR]', 'If GLOBAL_VAR is specified and only one module is being processed, exports it to the GLOBAL_VAR global variable.', 'If GLOBAL_VAR is specified and multiple modules are being processed, exports each one of them as a property of GLOBAL_VAR.', 'If GLOBAL_VAR isn\'t specified, exports the module to global variables corresponding to their identifier.') do |global|
+    options[:global] = global || true
   end
   
   opts.on('--sync', 'Load all dependencies synchronously.') do |global|
@@ -87,7 +87,9 @@ begin
   if options.delete(:dependency_graph)
     result = Modulr.graph(ARGV.first, options)
   else
-    result = Modulr.ize(ARGV.first, options)
+    args = opts.default_argv.dup
+    args << options
+    result = Modulr.ize(*args)
     output.print(result)
   end
 ensure
